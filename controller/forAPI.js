@@ -1,7 +1,13 @@
 const request = require('request');
 require('dotenv').config();
 
-function postAPIfunction(url, bodyData){
+/**
+ * HYPHEN API request 및 response 반환
+ * @param {API uri} url 
+ * @param {body DATA} bodyData 
+ * @returns 성공시 API response 반환
+ */
+const postAPIfunction = (url, bodyData) => {
     return new Promise((res, rej) => {
         const options = {
             uri : url, 
@@ -19,7 +25,12 @@ function postAPIfunction(url, bodyData){
         });
     });
 }
-function makeBodyData(data){
+/**
+ * HYPHEN API 요청시 body에 들어갈 기본적인 정보 생성
+ * @param {reqest Data} data 
+ * @returns API 명세에 맞는 기본 JSON 형식의 body value
+ */
+const makeBodyData = (data) => {
     return {
         loginMethod : 'EASY',
         loginOrgCd : data.loginOrgCd,
