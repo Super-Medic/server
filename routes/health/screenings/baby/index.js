@@ -2,12 +2,15 @@ const express = require('express');
 const router = express.Router();
 const {postAPIfunction, makeBodyData} = require('../../../../controller/forAPI');
 
-router.post('/', async function(req, res, next) {
+/**
+ * 영유아 건강검진 결과
+ */
+router.post('/', function(req, res, next) {
     let url = 'https://api.hyphen.im/in0002000436'
 
     let bodyData = makeBodyData(req.body)
 
-    await postAPIfunction(url, bodyData).then((resAPI) => {
+    postAPIfunction(url, bodyData).then((resAPI) => {
         res.send(JSON.parse(resAPI))
     }).catch((err) => {
         console.log('error = ' + err);
@@ -15,6 +18,9 @@ router.post('/', async function(req, res, next) {
     });
 });
 
+/**
+ * 영유아 건강검진 결과 TEST
+ */
 router.post('/test', function(req, res, next) {
     const data = req.body
     if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null)
@@ -22,6 +28,9 @@ router.post('/test', function(req, res, next) {
     res.send(babyScreeningData)
 });
 
+/**
+ * 영유아 건강검진 결과 TEST DATA
+ */
 const babyScreeningData = {
     "common": {
         "user_tr_no": "",

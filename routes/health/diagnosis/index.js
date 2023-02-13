@@ -4,6 +4,9 @@ const {postAPIfunction, makeBodyData} = require('../../../controller/forAPI');
 require('date-utils');
 var newDate = new Date();
 
+/**
+ * 진료 내역
+ */
 router.post('/',  function(req, res, next) {
     const url = 'https://api.hyphen.im/in0002000427'
 
@@ -19,6 +22,9 @@ router.post('/',  function(req, res, next) {
     });
 });
 
+/**
+ * 진료 내역 TEST
+ */
 router.post('/test', function(req, res, next) {
     const data = req.body
     if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.subjectType == null)
@@ -26,6 +32,9 @@ router.post('/test', function(req, res, next) {
     res.send(diagnosisTestData)
 });
 
+/**
+ * 진료 내역 TEST DATA
+ */
 const diagnosisTestData = {
     "common": {
         "userTrNo": "",
