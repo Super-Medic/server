@@ -2,14 +2,17 @@ const express = require('express');
 const router = express.Router();
 const {postAPIfunction, makeBodyData} = require('../../../controller/forAPI');
 
-router.post('/', async function(req, res, next) {
+/**
+ * 투약 내역
+ */
+router.post('/', function(req, res, next) {
     const url = 'https://api.hyphen.im/in0002000428'
 
     let bodyData = makeBodyData(req.body)
     bodyData['subjectType'] = req.body.subjectType
     bodyData['detailYn'] = 'Y'
 
-    await postAPIfunction(url, bodyData).then((resAPI) => {
+    postAPIfunction(url, bodyData).then((resAPI) => {
         res.send(JSON.parse(resAPI))
     }).catch((err) => {
         console.log('error = ' + err);
@@ -17,6 +20,9 @@ router.post('/', async function(req, res, next) {
     });
 });
 
+/**
+ * 투약 내역 TEST
+ */
 router.post('/test', function(req, res, next) {
     const data = req.body
     if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.subjectType == null)
@@ -24,6 +30,9 @@ router.post('/test', function(req, res, next) {
     res.send(medicineTestData)
 });
 
+/**
+ * 투약 내역 TEST DATA
+ */
 const medicineTestData = {
     "common": {
         "userTrNo": "",
