@@ -7,7 +7,7 @@ var newDate = new Date();
 /**
  * 진료 내역
  */
-router.post('/',  function(req, res, next) {
+router.post('/',  (req, res, next) => {
     const url = 'https://api.hyphen.im/in0002000427'
 
     let bodyData = makeBodyData(req.body)
@@ -24,8 +24,9 @@ router.post('/',  function(req, res, next) {
 
 /**
  * 진료 내역 TEST
+ * app 배포시 삭제
  */
-router.post('/test', function(req, res, next) {
+router.post('/test', (req, res, next) => {
     const data = req.body
     if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.subjectType == null)
         return res.status(404).end();
@@ -34,6 +35,7 @@ router.post('/test', function(req, res, next) {
 
 /**
  * 진료 내역 TEST DATA
+ * app 배포시 삭제
  */
 const diagnosisTestData = {
     "common": {
