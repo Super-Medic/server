@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const {postAPIfunction, makeBodyData} = require('../../../controller/forAPI');
+const {makeParsingClass} = require('../../../controller/dataParse');
 require('date-utils');
 var newDate = new Date();
-
+const keyList =['No', 'pharmNm','diagType', 'diagSdate']
 /**
  * 진료 내역
  */
@@ -14,8 +15,10 @@ router.post('/',  (req, res, next) => {
     bodyData['subjectType'] = req.body.subjectType
     bodyData['fromDate'] = req.body.birthday
     bodyData['toDate'] = newDate.toFormat('YYYYMMDD')
+    
     postAPIfunction(url, bodyData).then((resAPI) => {
-        res.send(JSON.parse(resAPI))
+        let parseData = new makeParsingClass(JSON.parse(resAPI['data']['list']))
+        res.send(parseData.getListDataEach('sublist', keyList))
     }).catch((err) => {
         console.log('error = ' + err);
         res.status(500).end()
@@ -30,7 +33,9 @@ router.post('/test', (req, res, next) => {
     const data = req.body
     if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.subjectType == null)
         return res.status(404).end();
-    res.send(diagnosisTestData)
+
+    let parseData = new makeParsingClass(diagnosisTestData['data']['list'])
+    res.send(parseData.getListDataEach('sublist', keyList))
 });
 
 /**

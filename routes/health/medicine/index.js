@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const {postAPIfunction, makeBodyData} = require('../../../controller/forAPI');
-
 /**
  * 투약 내역
  */
