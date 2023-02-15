@@ -3,12 +3,17 @@ const router = express.Router();
 const {postAPIfunction, makeBodyData} = require('../../../controller/forAPI');
 const {makeParsingClass} = require('../../../controller/dataParse');
 const baby = require('./baby');
-const basicKey = ['year', 'chkAgency', 'opinion'];
-const ValueList = ['검진일자', '신장', '체중', '허리둘레', '체질량지수', '시각이상', '청각이상', '혈압(최고/최저)','요단백', '혈색소', '공복혈당', '총콜레스테롤', 'HDL콜레스테롤', '중성지방', 'LDL콜레스테롤', '혈청크레아티닌', '신사구체여과율(GFR)', 'AST (SGOT)', 'ALT(SGPT)','감마지티피(y-GTP)','폐결핵 흉부질환', '골다공증']
+
 /**
  * 영유아 건강검진
  */
 router.use("/baby", baby);
+
+const basicKey = ['year', 'chkAgency', 'opinion'];
+const valueList = ['검진일자', '신장', '체중', '허리둘레', '체질량지수', '시력(좌/우)', '청각(좌/우)', 
+                    '혈압(최고/최저)','요단백', '혈색소', '공복혈당', '총콜레스테롤', 'HDL콜레스테롤', '중성지방', 'LDL콜레스테롤', 
+                    '혈청크레아티닌', '신사구체여과율(GFR)', 'AST (SGOT)', 'ALT(SGPT)','감마지티피(y-GTP)','폐결핵 흉부질환', '골다공증']
+
 /**
  * 건강검진 결과
  */
@@ -17,22 +22,22 @@ router.post('/', (req, res, next) => {
     let bodyData = makeBodyData(req.body)
 
     postAPIfunction(url, bodyData).then((resAPI) => {
-        let parseData = new makeParsingClass(JSON.parse(resAPI['data']['list']));
+        let parseData = new makeParsingClass(JSON.parse(resAPI)['data']['list']);
         let sendRes = []
-        for(let i = 0; i<parseData.Count; i++){
-            sendRes.push(
-                Object.assign(
-                    parseData.getBasicData(basicKey, i), 
-                    parseData.getListData('chkResult', 'inspectItem', ValueList, 'result', i)
-                )
-            )
+        for(let i = 0; i < parseData.Count; i++){
+            sendRes.push(Object.assign(
+                parseData.getDataByKeyList(basicKey, i), 
+                parseData.getDataByKeyValueInList('chkResult', valueList, i))
+            );
         }
-        res.send(sendRes)
+        res.send(sendRes);
+
     }).catch((err) => {
         console.log('error = ' + err);
         res.status(500).end()
     });
 });
+
 /**
  * 건강검진 결과 TEST
  * app 배포시 삭제
@@ -44,13 +49,11 @@ router.post('/test', (req, res, next) => {
 
     let parseData = new makeParsingClass(screeningsTestData['data']['list']);
     let sendRes = [];
-    for(let i = 0; i<parseData.Count; i++){
-        sendRes.push(
-            Object.assign(
-                parseData.getBasicData(basicKey, i), 
-                parseData.getListData('chkResult', 'inspectItem', ValueList, 'result', i)
-            )
-        )
+    for(let i = 0; i < parseData.Count; i++){
+        sendRes.push(Object.assign(
+            parseData.getDataByKeyList(basicKey, i), 
+            parseData.getDataByKeyValueInList('chkResult','result', 'inspectItem' ,valueList, i))
+        );
     }
     res.send(sendRes)
 });

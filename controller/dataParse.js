@@ -1,3 +1,43 @@
+const mdbConn = require('../db_connection/mariaDBConn')
+
+function getDataByKeyListFunc(list, keyList){
+    let returnData = {};
+    for(let i=0;i<keyList.length;i++)
+        returnData[keyList[i]] = list[keyList[i]]
+    return returnData
+}
+function getDataByKeyValueFunc(list,returnKey, key , value){
+    if(list[key] == value){
+        return (returnKey != null ? list[returnKey] : list);
+    }
+    return
+}
+async function insertMedicineDetail(data){
+    let sql = 'SELECT medicineNm FROM medicine WHERE medicineNm=?'
+    let sql2 = 'INSERT INTO medicine(medicineNm, detail) VALUES(?, ?)'
+    let info = {
+        'medicineNm':data['MEDI_PRDC_NM'],
+        'details': data
+    }
+    await mdbConn.dbSelect(sql, info['medicineNm'])
+    .then((row) => {
+        if(!row){
+            let params = [info['medicineNm'], info['details']]
+            mdbConn.dbInsert(sql2, params)
+            .then((row) => {
+                console.log("의약정보 저장")
+            })
+            .catch((err) => {
+                res.status(500).send(err)
+            })
+        }
+    })
+    .catch((err) => {
+        res.status(500).send(err)
+    })
+}
+
+
 /**
  * data : JSON['data']['list']
  */
@@ -9,44 +49,32 @@ class makeParsingClass{
     get Count(){
         return this.dataCount;
     }
+
     /**
-     * 사용처 : screenings(건강검진)
-     * @param {list} coreKeyList list 형식의 뽑아올 DATA
-     * @param {int} idx 전체 Data에서의 list 내에서 index
-     * @return {JSON} List 새로운 list로 들어가기 전 { } 넘겨준 Key값에 대해서만 return
+     * 키값에 대응하는 value 값들을 가지고 옴
+     * @param {list} keyList KEY 리스트 
+     * @param {int} idx 원본 JSON list 내 idx
+     * @returns {JSON}
      */
-    getBasicData(coreKeyList,idx=0){
-        let selectData = this.data[idx];
-        let returnData = {};
-        for(let i=0;i<coreKeyList.length;i++){
-            returnData[coreKeyList[i]] = selectData[coreKeyList[i]]
-        }
+    getDataByKeyList(keyList, idx = 0){
+        let parseData = this.data[idx];
+        let returnData = getDataByKeyListFunc(parseData, keyList);
         return returnData;
     }
+
     /**
-     * 사용처 : screenings(건강검진)
-     * @param {string} listName JSON 내 원하는 리스트 KEY
-     * @param {string} findKey 찾고자 하는 field의 KEY
-     * @param {list} findValueList 찾고자 하는 field의 Value
-     * @param {string} returnKey return 받고자하는 값의 KEY
-     * @param {int} idx 전체 Data에서의 list 내에서 index
-     * @returns {JSON} List 내 { } 안에 있는 것 중 넘겨준 key값과 value 값이 일치하는 것만 return
+     * 키값과 value가 같다면 return 다르다면 undefined return
+     * @param {string} key 
+     * @param {string} value 
+     * @param {string} returnKey 
+     * @param {idx} idx 
+     * @returns 
      */
-    getListData(listName, findKey, findValueList,returnKey,idx=0){
-        let list = this.data[idx][listName];
-        let returnData = {};
-        for(let i=0;i<list.length;i++){
-            for(let j=0;j<findValueList.length;j++){
-                if(list[i][findKey] == findValueList[j]){
-                    returnData[findValueList[j]] = list[i][returnKey];
-                    break;
-                }
-            }
-            if(returnData.length == findValueList.length)
-                break;
-        }
-        return returnData;
+    getDataByKeyValue(key, value, returnKey = null, idx = 0){
+        let parseData = this.data[idx];
+        getDataByKeyValueFunc(parseData, returnKey, key,value)
     }
+
     /**
      * @param {string} listName JSON 내 원하는 리스트 KEY
      * @param {int} idx 전체 Data에서의 list 내에서 index
@@ -55,43 +83,67 @@ class makeParsingClass{
     getListDataAll(listName,idx=0){
         return this.data[idx][listName];
     }
+
     /**
-     * 사용처 : diagnosis(진료정보)
+     * list 안에서 객체 내에서 원한는 Key값들을 가지고 오는 함수
      * @param {string} listName JSON 내 원하는 리스트 KEY
-     * @param {list} findKeyList 찾고자 하는 field의 KEY List
-     * @param {int} idx 전체 Data에서의 list 내에서 index
-     * @returns {list} List 내 { } 안에 있는 것 중 원하는 Key 값만 가진채 return
+     * @param {list} keyList 가지고 오고자 하는 Key값들
+     * @param {int} idx 
+     * @returns {list} 진료정보
      */
-    getListDataEach(listName, findKeyList, idx=0){
+    getDataByKeyListInList(listName, keyList, idx = 0){
+        let list = this.data[idx][listName];
+        let returnList = []
+        for(let j = 0; j < list.length; j++){
+            returnList.push(getDataByKeyListFunc(list[j], keyList));
+        }
+        return returnList
+    }
+
+    /**
+     * list 안 객체 내에서 넘겨준 key와 value가 일치하는 객체에서 returnkey의 값만 가지고 오는 함수
+     * @param {string} listName 
+     * @param {string} returnKey 
+     * @param {string} key 
+     * @param {list} valueList 
+     * @param {int} idx 
+     * @returns 건강검진
+     */
+    getDataByKeyValueInList(listName, returnKey, key, valueList, idx = 0){
+        let list = this.data[idx][listName];
+        let cnt = 0;
+        let returnData = {}
+        for(let j = 0; j<list.length; j++){
+            while(cnt < valueList.length){ // ValueList가 JSON 내에 순서대로 있으며, 누락된 값이 없다면 while을 지우고 idx를 j로 변경하면 됨
+                returnData[valueList[cnt]] = getDataByKeyValueFunc(list[j], returnKey, key, valueList[cnt])
+                cnt++;
+                break;
+            }
+        }
+        return returnData
+    }
+    /**
+     * list 안 객체 내의 list를 가지고 오는 method
+     * @param {string} listName 
+     * @param {string} secListName 
+     * @param {list} KeyList 
+     * @param {int} idx 
+     * @returns 투약정보
+     */
+    getDataByKeyListInListInList(listName,secListName, KeyList, idx=0){
         let list = this.data[idx][listName];
         let returnList = [];
-        let returnData = {};
-        for(let i=0;i<list.length;i++){
-            for(let j=0;j<findKeyList.length;j++){
-                returnData[findKeyList[j]] = list[i][findKeyList[j]]
-            }
+        for(let j = 0; j < list.length; j++){
+            let returnData = {};
+            returnData = getDataByKeyListFunc(list[j], KeyList);
+            returnData[secListName] = list[j][secListName]
             returnList.push(returnData);
-            returnData = {};
         }
-        return returnList;
-    }
-    getListDataEachAndAll(listName,secListName, coreKeyList, idx=0){
-        let newParse = this.data[idx][listName];
-        let returnData = {};
-        let returnList = [];
-        for(let j = 0; j < newParse.length; j++){
-            for(let i=0; i<coreKeyList.length; i++){
-                returnData[coreKeyList[i]] = newParse[j][coreKeyList[i]]
-            }
-            returnData[secListName] = newParse[j][secListName]
-            returnList.push(returnData);
-            returnData = {};
-        }
-
         return returnList;
     }
 }
 
 module.exports = {
-    makeParsingClass : makeParsingClass
+    makeParsingClass : makeParsingClass,
+    insertMedicineDetail : insertMedicineDetail
 }

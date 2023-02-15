@@ -4,7 +4,9 @@ const {postAPIfunction, makeBodyData} = require('../../../controller/forAPI');
 const {makeParsingClass} = require('../../../controller/dataParse');
 require('date-utils');
 var newDate = new Date();
-const keyList =['No', 'pharmNm','diagType', 'diagSdate']
+
+const keyList =['No', 'pharmNm','diagType', 'diagSdate'];
+
 /**
  * 진료 내역
  */
@@ -17,8 +19,15 @@ router.post('/',  (req, res, next) => {
     bodyData['toDate'] = newDate.toFormat('YYYYMMDD')
     
     postAPIfunction(url, bodyData).then((resAPI) => {
-        let parseData = new makeParsingClass(JSON.parse(resAPI['data']['list']))
-        res.send(parseData.getListDataEach('sublist', keyList))
+        let parseData = new makeParsingClass(JSON.parse(resAPI)['data']['list'])
+        let sendRes = []
+        for(let i = 0; i < parseData.Count; i++) {
+            let resp = []
+            resp.push(parseData.getDataByKeyList(['examinee'],i));
+            sendRes.push(resp.concat(parseData.getDataByKeyListInList('sublist', keyList, i)));
+        }
+        res.send(sendRes)
+        
     }).catch((err) => {
         console.log('error = ' + err);
         res.status(500).end()
@@ -35,7 +44,13 @@ router.post('/test', (req, res, next) => {
         return res.status(404).end();
 
     let parseData = new makeParsingClass(diagnosisTestData['data']['list'])
-    res.send(parseData.getListDataEach('sublist', keyList))
+    let sendRes = []
+    for(let i = 0; i < parseData.Count; i++) {
+        let resp = []
+        resp.push(parseData.getDataByKeyList(['examinee'],i));
+        sendRes.push(resp.concat(parseData.getDataByKeyListInList('sublist', keyList, i)));
+    }
+    res.send(sendRes)
 });
 
 /**
