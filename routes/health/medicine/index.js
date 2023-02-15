@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const {postAPIfunction, makeBodyData} = require('../../../controller/forAPI');
-const {makeParsingClass} = require('../../../controller/dataParse');
+const {makeParsingClass, insertMedicineDetail} = require('../../../controller/dataParse');
+
 const keyList = ['No', 'pharmNm', 'medDate', 'medType']
+
 /**
  * 투약 내역
  */
@@ -15,17 +17,19 @@ router.post('/', (req, res, next) => {
 
     postAPIfunction(url, bodyData).then((resAPI) => {
         let parseData = new makeParsingClass(JSON.parse(resAPI['data']['list']));
-        let data = parseData.getListDataEachAndAll('sublist','medList',keyList)
+        let data = parseData.getDataByKeyListInListInList('sublist','medList',keyList)
         for(let i = 0; i < data.length; i++) {
-            for(let j = 0; j < data[i]['medList'].length; j++) {
-                delete data[i]['medList'][j].No
-                delete data[i]['medList'][j].diagDate
-                delete data[i]['medList'][j].diagType
-                delete data[i]['medList'][j].presCnt
+            for(let j = 0; j < data[i]['medList'].length; j++) { // 의약품 상세 정보 제거 및 불필요 정보 delete
+                insertMedicineDetail(data[i]['medList'][j]['detailObj'])
+                delete data[i]['medList'][j].No;
+                delete data[i]['medList'][j].diagDate;
+                delete data[i]['medList'][j].diagType;
+                delete data[i]['medList'][j].presCnt;
+                delete data[i]['medList'][j].detailObj;
             }
         }
-        
         res.send(data);
+
     }).catch((err) => {
         console.log('error = ' + err);
         res.status(500).end()
@@ -36,24 +40,24 @@ router.post('/', (req, res, next) => {
  * 투약 내역 TEST
  * app 배포시 삭제
  */
-router.post('/test', (req, res, next) => {
-    // const data = req.body
-    // if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.subjectType == null)
-    //     return res.status(404).end();
+router.post('/test', async (req, res, next) => {
+    const body = req.body
+    if(body.loginOrgCd == null || body.name == null || body.birthday == null || body.mobileNo == null || body.subjectType == null)
+        return res.status(404).end();
+        
     let parseData = new makeParsingClass(medicineTestData['data']['list']);
-    let data = parseData.getListDataEachAndAll('sublist','medList',keyList)
-    let medicineDetail = [];
+    var data = parseData.getDataByKeyListInListInList('sublist','medList',keyList)
+
     for(let i = 0; i < data.length; i++) {
         for(let j = 0; j < data[i]['medList'].length; j++) {
-            medicineDetail.push(data[i]['medList'][j]['detailObj'])
-            delete data[i]['medList'][j].No
-            delete data[i]['medList'][j].diagDate
-            delete data[i]['medList'][j].diagType
-            delete data[i]['medList'][j].presCnt
-            delete data[i]['medList'][j].detailObj
+            insertMedicineDetail(data[i]['medList'][j]['detailObj']);
+            delete data[i]['medList'][j].No;
+            delete data[i]['medList'][j].diagDate;
+            delete data[i]['medList'][j].diagType;
+            delete data[i]['medList'][j].presCnt;
+            delete data[i]['medList'][j].detailObj;
         }
     }
-    console.log(medicineDetail)
     res.send(data);
 });
 
