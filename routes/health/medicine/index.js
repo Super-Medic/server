@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const {postAPIfunction, makeBodyData} = require('../../../controller/forAPI');
+const {makeParsingClass} = require('../../../controller/dataParse');
+const keyList = ['No', 'pharmNm', 'medDate', 'medType']
 /**
  * 투약 내역
  */
@@ -12,7 +14,18 @@ router.post('/', (req, res, next) => {
     bodyData['detailYn'] = 'Y'
 
     postAPIfunction(url, bodyData).then((resAPI) => {
-        res.send(JSON.parse(resAPI))
+        let parseData = new makeParsingClass(JSON.parse(resAPI['data']['list']));
+        let data = parseData.getListDataEachAndAll('sublist','medList',keyList)
+        for(let i = 0; i < data.length; i++) {
+            for(let j = 0; j < data[i]['medList'].length; j++) {
+                delete data[i]['medList'][j].No
+                delete data[i]['medList'][j].diagDate
+                delete data[i]['medList'][j].diagType
+                delete data[i]['medList'][j].presCnt
+            }
+        }
+        
+        res.send(data);
     }).catch((err) => {
         console.log('error = ' + err);
         res.status(500).end()
@@ -24,10 +37,24 @@ router.post('/', (req, res, next) => {
  * app 배포시 삭제
  */
 router.post('/test', (req, res, next) => {
-    const data = req.body
-    if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.subjectType == null)
-        return res.status(404).end();
-    res.send(medicineTestData)
+    // const data = req.body
+    // if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.subjectType == null)
+    //     return res.status(404).end();
+    let parseData = new makeParsingClass(medicineTestData['data']['list']);
+    let data = parseData.getListDataEachAndAll('sublist','medList',keyList)
+    let medicineDetail = [];
+    for(let i = 0; i < data.length; i++) {
+        for(let j = 0; j < data[i]['medList'].length; j++) {
+            medicineDetail.push(data[i]['medList'][j]['detailObj'])
+            delete data[i]['medList'][j].No
+            delete data[i]['medList'][j].diagDate
+            delete data[i]['medList'][j].diagType
+            delete data[i]['medList'][j].presCnt
+            delete data[i]['medList'][j].detailObj
+        }
+    }
+    console.log(medicineDetail)
+    res.send(data);
 });
 
 /**
