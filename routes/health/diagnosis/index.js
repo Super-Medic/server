@@ -24,9 +24,9 @@ router.post('/',  (req, res, next) => {
         for(let i = 0; i < parseData.Count; i++) {
             let resp = []
             resp.push(parseData.getDataByKeyList(['examinee'],i));
-            sendRes.push(resp.concat(parseData.getDataByKeyListInList('sublist', keyList, i)));
+            sendRes.push({diagnosisList : resp.concat(parseData.getDataByKeyListInList('sublist', keyList, i))});
         }
-        res.send(sendRes)
+        res.send({diagnosisTotalList : sendRes})
         
     }).catch((err) => {
         console.log('error = ' + err);
@@ -48,9 +48,9 @@ router.post('/test', (req, res, next) => {
     for(let i = 0; i < parseData.Count; i++) {
         let resp = []
         resp.push(parseData.getDataByKeyList(['examinee'],i));
-        sendRes.push(resp.concat(parseData.getDataByKeyListInList('sublist', keyList, i)));
+        sendRes.push({diagnosisList :resp.concat(parseData.getDataByKeyListInList('sublist', keyList, i))});
     }
-    res.send(sendRes)
+    res.send({diagnosisTotalList : sendRes})
 });
 
 /**

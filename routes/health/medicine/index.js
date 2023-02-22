@@ -28,7 +28,7 @@ router.post('/', (req, res, next) => {
                 delete data[i]['medList'][j].detailObj;
             }
         }
-        res.send(data);
+        res.send({medicineList : data});
 
     }).catch((err) => {
         console.log('error = ' + err);
@@ -44,8 +44,8 @@ router.post('/test', async (req, res, next) => {
     const body = req.body
     if(body.loginOrgCd == null || body.name == null || body.birthday == null || body.mobileNo == null || body.subjectType == null)
         return res.status(404).end();
-        
-    let parseData = new makeParsingClass(medicineTestData['data']['list']);
+    let testData = medicineTestData
+    let parseData = new makeParsingClass(testData['data']['list']);
     var data = parseData.getDataByKeyListInListInList('sublist','medList',keyList)
 
     for(let i = 0; i < data.length; i++) {
@@ -58,7 +58,7 @@ router.post('/test', async (req, res, next) => {
             delete data[i]['medList'][j].detailObj;
         }
     }
-    res.send(data);
+    res.send({medicineList : data});
 });
 
 /**
