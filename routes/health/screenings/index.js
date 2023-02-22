@@ -30,7 +30,7 @@ router.post('/', (req, res, next) => {
                 parseData.getDataByKeyValueInList('chkResult', valueList, i))
             );
         }
-        res.send(sendRes);
+        res.send({ screenings : sendRes})
 
     }).catch((err) => {
         console.log('error = ' + err);
@@ -55,7 +55,7 @@ router.post('/test', (req, res, next) => {
             parseData.getDataByKeyValueInList('chkResult','result', 'inspectItem' ,valueList, i))
         );
     }
-    res.send(sendRes)
+    res.send({ screenings : sendRes})
 });
 
 /**
