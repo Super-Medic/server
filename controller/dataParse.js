@@ -142,8 +142,19 @@ class makeParsingClass{
         return returnList;
     }
 }
+function korToEng(jsonObject, keyList){
+    const keys = Object.keys(jsonObject);
+    let idx = 0;
+    keys.forEach((key) => {
+        var newKey = keyList[idx++];
+        jsonObject[newKey] = jsonObject[key];
+        delete jsonObject[key];
+    });
+    return jsonObject
+}
 
 module.exports = {
     makeParsingClass : makeParsingClass,
-    insertMedicineDetail : insertMedicineDetail
+    insertMedicineDetail : insertMedicineDetail,
+    korToEng : korToEng
 }
