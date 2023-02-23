@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {postAPIfunction, makeBodyData} = require('../../../controller/forAPI');
-const {makeParsingClass} = require('../../../controller/dataParse');
+const {makeParsingClass, korToEng} = require('../../../controller/dataParse');
 const baby = require('./baby');
 
 /**
@@ -30,7 +30,7 @@ router.post('/', (req, res, next) => {
                 parseData.getDataByKeyValueInList('chkResult', valueList, i))
             );
         }
-        res.send({ screenings : sendRes})
+        res.send({ screeningList : sendRes})
 
     }).catch((err) => {
         console.log('error = ' + err);
@@ -55,8 +55,37 @@ router.post('/test', (req, res, next) => {
             parseData.getDataByKeyValueInList('chkResult','result', 'inspectItem' ,valueList, i))
         );
     }
-    res.send({ screenings : sendRes})
+    for( var i =0; i < sendRes.length; i++){
+        sendRes[i] = korToEng(sendRes[i], keyList)
+    }
+    res.send({ screeningList : sendRes})
 });
+const keyList = [
+    "year",
+    "chkAgency",
+    "opinion",
+    "screeningDate",
+    "kidney",
+    "weight",
+    "waist",
+    "BMI",
+    "vision",
+    "hearing",
+    "bloodPressure",
+    "proteinuria",
+    "hemoglobin",
+    "FBG",
+    "cholesterol",
+    "HDL",
+    "triglycerides",
+    "LDL",
+    "serumCreatinine",
+    "GFR",
+    "SGOT",
+    "SGPT",
+    "y_GTP",
+    "tuberculosis",
+    "osteoporosis",]
 
 /**
  * 건강검진 결과 TEST DATA
