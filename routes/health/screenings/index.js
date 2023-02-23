@@ -9,7 +9,7 @@ const baby = require('./baby');
  */
 router.use("/baby", baby);
 
-const basicKey = ['year', 'chkAgency', 'opinion'];
+const basicKey = ['year', 'result', 'chkAgency', 'opinion'];
 const valueList = ['검진일자', '신장', '체중', '허리둘레', '체질량지수', '시력(좌/우)', '청각(좌/우)', 
                     '혈압(최고/최저)','요단백', '혈색소', '공복혈당', '총콜레스테롤', 'HDL콜레스테롤', '중성지방', 'LDL콜레스테롤', 
                     '혈청크레아티닌', '신사구체여과율(GFR)', 'AST (SGOT)', 'ALT(SGPT)','감마지티피(y-GTP)','폐결핵 흉부질환', '골다공증']
@@ -27,7 +27,7 @@ router.post('/', (req, res, next) => {
         for(let i = 0; i < parseData.Count; i++){
             sendRes.push(Object.assign(
                 parseData.getDataByKeyList(basicKey, i), 
-                parseData.getDataByKeyValueInList('chkResult', valueList, i))
+                korToEng(parseData.getDataByKeyValueInList('chkResult','result', 'inspectItem' ,valueList, i),keyList))
             );
         }
         res.send({ screeningList : sendRes})
@@ -52,18 +52,12 @@ router.post('/test', (req, res, next) => {
     for(let i = 0; i < parseData.Count; i++){
         sendRes.push(Object.assign(
             parseData.getDataByKeyList(basicKey, i), 
-            parseData.getDataByKeyValueInList('chkResult','result', 'inspectItem' ,valueList, i))
+            korToEng(parseData.getDataByKeyValueInList('chkResult','result', 'inspectItem' ,valueList, i),keyList))
         );
-    }
-    for( var i =0; i < sendRes.length; i++){
-        sendRes[i] = korToEng(sendRes[i], keyList)
     }
     res.send({ screeningList : sendRes})
 });
 const keyList = [
-    "year",
-    "chkAgency",
-    "opinion",
     "screeningDate",
     "kidney",
     "weight",
