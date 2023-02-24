@@ -38,7 +38,9 @@ const makeBodyData = (data) => {
         resNo : data.birthday,
         mobileNo : data.mobileNo,
         mobileCo : data.mobileCo != null ? data.mobileCo : 'null',
-        stepMode : 'nostep'
+        stepMode : 'step',
+        step : data.step,
+        step_data : data.step_data != null ? data.step_data : ''
     }
 }
 
