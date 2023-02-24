@@ -61,7 +61,7 @@ router.post('/testinit', (req, res, next) => {
  * 건강검진 결과 TEST
  * app 배포시 삭제
  */
-router.post('/test', (req, res, next) => {
+router.post('/testsign', (req, res, next) => {
     const data = req.body
     if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.step != 'sign' || data.step_data != '1234')
         return res.status(404).end();
