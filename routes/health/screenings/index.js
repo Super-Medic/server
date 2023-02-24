@@ -52,7 +52,7 @@ router.post('/sign', (req, res, next) => {
 
 router.post('/testinit', (req, res, next) => {
     const data = req.body
-    if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.step == 'init')
+    if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.step != 'init')
         return res.status(404).end();
 
     res.send('1234')
@@ -63,7 +63,7 @@ router.post('/testinit', (req, res, next) => {
  */
 router.post('/test', (req, res, next) => {
     const data = req.body
-    if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.step == 'sign' || data.step_data == '1234')
+    if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.step != 'sign' || data.step_data != '1234')
         return res.status(404).end();
 
     let parseData = new makeParsingClass(screeningsTestData['data']['list']);
