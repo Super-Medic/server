@@ -8,9 +8,22 @@ const keyList = ['No', 'pharmNm', 'medDate', 'medType']
 /**
  * 투약 내역
  */
-router.post('/', (req, res, next) => {
+router.post('/init', (req, res, next) => {
     const url = 'https://api.hyphen.im/in0002000428'
+    let bodyData = makeBodyData(req.body)
+    bodyData['subjectType'] = req.body.subjectType
+    bodyData['detailYn'] = 'Y'
 
+    postAPIfunction(url, bodyData).then((resAPI) => {
+        res.send(JSON.parse(resAPI)['data'].stepData);
+    }).catch((err) => {
+        console.log('error = ' + err);
+        res.status(500).end()
+    });
+});
+
+router.post('/sign', (req, res, next) => {
+    const url = 'https://api.hyphen.im/in0002000428'
     let bodyData = makeBodyData(req.body)
     bodyData['subjectType'] = req.body.subjectType
     bodyData['detailYn'] = 'Y'
@@ -40,9 +53,17 @@ router.post('/', (req, res, next) => {
  * 투약 내역 TEST
  * app 배포시 삭제
  */
-router.post('/test', async (req, res, next) => {
+router.post('/testinit', (req, res, next) => {
+    const data = req.body
+    if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.step != 'init' ||  body.subjectType == null)
+        return res.status(404).end();
+
+    res.send('1234')
+});
+
+router.post('/testsign', async (req, res, next) => {
     const body = req.body
-    if(body.loginOrgCd == null || body.name == null || body.birthday == null || body.mobileNo == null || body.subjectType == null)
+    if(body.loginOrgCd == null || body.name == null || body.birthday == null || body.mobileNo == null || body.subjectType == null ||  data.step != 'sign' || data.step_data != '1234')
         return res.status(404).end();
     let testData = medicineTestData
     let parseData = new makeParsingClass(testData['data']['list']);
