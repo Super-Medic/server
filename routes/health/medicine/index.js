@@ -55,7 +55,7 @@ router.post('/sign', (req, res, next) => {
  */
 router.post('/testinit', (req, res, next) => {
     const data = req.body
-    if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.step != 'init' ||  body.subjectType == null)
+    if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.step != 'init' ||  data.subjectType == null)
         return res.status(404).end();
 
     res.send('1234')
