@@ -10,7 +10,23 @@ const keyList =['No', 'pharmNm','diagType', 'diagSdate'];
 /**
  * 진료 내역
  */
-router.post('/',  (req, res, next) => {
+router.post('/init', (req, res, next) => {
+    const url = 'https://api.hyphen.im/in0002000427'
+
+    let bodyData = makeBodyData(req.body)
+    bodyData['subjectType'] = req.body.subjectType
+    bodyData['fromDate'] = req.body.birthday
+    bodyData['toDate'] = newDate.toFormat('YYYYMMDD')
+
+    postAPIfunction(url, bodyData).then((resAPI) => {
+        res.send(JSON.parse(resAPI)['data'].stepData);
+    }).catch((err) => {
+        console.log('error = ' + err);
+        res.status(500).end()
+    });
+});
+
+router.post('/sign',  (req, res, next) => {
     const url = 'https://api.hyphen.im/in0002000427'
 
     let bodyData = makeBodyData(req.body)
@@ -38,9 +54,17 @@ router.post('/',  (req, res, next) => {
  * 진료 내역 TEST
  * app 배포시 삭제
  */
-router.post('/test', (req, res, next) => {
+router.post('/testinit', (req, res, next) => {
     const data = req.body
-    if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.subjectType == null)
+    if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.step != 'init' ||  body.subjectType == null)
+        return res.status(404).end();
+
+    res.send('1234')
+});
+
+router.post('/testsign', (req, res, next) => {
+    const data = req.body
+    if(data.loginOrgCd == null || data.name == null || data.birthday == null || data.mobileNo == null || data.subjectType == null || data.step != 'sign' || data.step_data != '1234')
         return res.status(404).end();
 
     let parseData = new makeParsingClass(diagnosisTestData['data']['list'])

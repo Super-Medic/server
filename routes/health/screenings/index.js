@@ -13,7 +13,9 @@ const basicKey = ['year', 'result', 'chkAgency', 'opinion'];
 const valueList = ['검진일자', '신장', '체중', '허리둘레', '체질량지수', '시력(좌/우)', '청각(좌/우)', 
                     '혈압(최고/최저)','요단백', '혈색소', '공복혈당', '총콜레스테롤', 'HDL콜레스테롤', '중성지방', 'LDL콜레스테롤', 
                     '혈청크레아티닌', '신사구체여과율(GFR)', 'AST (SGOT)', 'ALT(SGPT)','감마지티피(y-GTP)','폐결핵 흉부질환', '골다공증']
-
+const keyList = ["screeningDate", "kidney", "weight", "waist", "BMI", "vision", "hearing", "bloodPressure", "proteinuria", 
+                    "hemoglobin", "FBG", "cholesterol", "HDL", "triglycerides", "LDL", "serumCreatinine", "GFR", "SGOT",
+                    "SGPT", "y_GTP", "tuberculosis", "osteoporosis"]
 /**
  * 건강검진 결과
  */
@@ -76,29 +78,7 @@ router.post('/testsign', (req, res, next) => {
     }
     res.send({ screeningList : sendRes})
 });
-const keyList = [
-    "screeningDate",
-    "kidney",
-    "weight",
-    "waist",
-    "BMI",
-    "vision",
-    "hearing",
-    "bloodPressure",
-    "proteinuria",
-    "hemoglobin",
-    "FBG",
-    "cholesterol",
-    "HDL",
-    "triglycerides",
-    "LDL",
-    "serumCreatinine",
-    "GFR",
-    "SGOT",
-    "SGPT",
-    "y_GTP",
-    "tuberculosis",
-    "osteoporosis",]
+
 
 /**
  * 건강검진 결과 TEST DATA
