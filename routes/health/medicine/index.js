@@ -63,7 +63,7 @@ router.post('/testinit', (req, res, next) => {
 
 router.post('/testsign', async (req, res, next) => {
     const body = req.body
-    if(body.loginOrgCd == null || body.name == null || body.birthday == null || body.mobileNo == null || body.subjectType == null ||  data.step != 'sign' || data.step_data != '1234')
+    if(body.loginOrgCd == null || body.name == null || body.birthday == null || body.mobileNo == null || body.subjectType == null ||  body.step != 'sign' || body.step_data != '1234')
         return res.status(404).end();
     let testData = medicineTestData
     let parseData = new makeParsingClass(testData['data']['list']);
