@@ -17,26 +17,20 @@ var storage = multer.diskStorage({
 var upload = multer({storage:storage})
 router.post('/upload', upload.single("image"), function (req,res) {
     const info = {
+        "email" : req.body['email'],
         "medicine": JSON.stringify(req.body['medicine'].replace(" ", "").split(',')),
         "day": req.body['day'],
         "times": req.body['times'],
         "image": req.file != undefined ? req.file.filename : null,
     };
-    var sql = 'SELECT id_idx FROM Users WHERE email=?'
-    mdbConn.dbSelect(sql,req.body['email'])
-    .then((row) => {
-        info['id_idx'] = row['id_idx']
-        var sql = 'INSERT INTO takingmedicine(id_idx, medicine_name, days, times, image) VALUES(?,?,?,?,?)';
-        var params = [info['id_idx'], info['medicine'], info['day'], info['times'], info['image']];
-        mdbConn.dbInsert(sql, params)
-        .then((rows) => {
-            if (!rows) res.status(500).send("false");
-            else res.status(200).send("true");
-        })
-        .catch((errMsg) => {
-            res.status(500).send(errMsg);
-        });
-    })        
+    var sql = 'INSERT INTO takingmedicine(email, medicine_name, days, times, image) VALUES(?,?,?,?,?)';
+    var params = [info['email'], info['medicine'], info['day'], info['times'], info['image']];
+
+    mdbConn.dbInsert(sql, params)
+    .then((rows) => {
+        if (!rows) res.status(500).send("false");
+        else res.status(200).send("true");
+    })
     .catch((errMsg) => {
         res.status(500).send(errMsg);
     });
@@ -44,19 +38,12 @@ router.post('/upload', upload.single("image"), function (req,res) {
 })
 router.get('/parse', function(req, res){
     let email = req.query.email
-    var sql = 'SELECT id_idx FROM Users WHERE email=?'
-    mdbConn.dbSelect(sql,email)
-    .then((row) => {
-        let user_idx = row['id_idx']
-        let sql = 'SELECT medicine_name, days, times  FROM takingmedicine WHERE id_idx=?'
-        mdbConn.dbSelectall(sql, user_idx)
-        .then((rows) => {
-            if(!rows) res.status(200).send('Empty')
-            console.log("parse arrive");
-            res.status(200).send(rows)
-        }).catch((err) => {
-            res.status(500).send(err);
-        })
+    let sql = 'SELECT medicine_name, days, times  FROM takingmedicine WHERE email=?'
+    mdbConn.dbSelectall(sql, email)
+    .then((rows) => {
+        if(!rows) res.status(200).send('Empty')
+        console.log("parse arrive");
+        res.status(200).send(rows)
     }).catch((err) => {
         res.status(500).send(err);
     })
