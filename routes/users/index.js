@@ -51,4 +51,21 @@ router.post('/joinverify', (req, res) => {
     });
 });
 
+/**
+ * 회원탈퇴
+ */
+router.post('/secession', (req, res) => {
+  const info = {
+    "email": req.body.account_email,
+  };
+
+  var sql = 'Delete FROM Users WHERE email=?'
+  mdbConn.dbSelect(sql, info['email'])
+    .then(() => {
+      res.status(200).send("true");
+    })
+    .catch((errMsg) => {
+      res.status(500).send(errMsg);
+    });
+});
 module.exports = router;
