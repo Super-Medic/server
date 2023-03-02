@@ -39,7 +39,7 @@ router.post('/joinverify', (req, res) => {
   };
 
   var sql = 'SELECT email FROM Users WHERE email=?'
-  mdbConn.dbSelect(sql, info['account_email'])
+  mdbConn.dbSelect(sql, info['email'])
     .then((rows) => {
       if (!rows) {
         res.status(200).send("false");
