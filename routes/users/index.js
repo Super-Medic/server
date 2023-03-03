@@ -68,4 +68,22 @@ router.post('/secession', (req, res) => {
       res.status(500).send(errMsg);
     });
 });
+
+/**
+ * 회원찾기
+ */
+router.post('/loginselect', (req, res) => {
+  const info = {
+    "email": req.body.account_email,
+  };
+
+  var sql = 'Select name, phone_number, birthday, gender FROM Users WHERE email=?'
+  mdbConn.dbSelect(sql, info['email'])
+    .then((result) => {
+      res.status(200).json(result);
+    })
+    .catch((errMsg) => {
+      res.status(500).send(errMsg);
+    });
+});
 module.exports = router;
