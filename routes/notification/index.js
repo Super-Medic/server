@@ -7,7 +7,7 @@ var serviceAccount = require("./supermedic-56c64-firebase-adminsdk-u959y-6bf21d5
 router.get('/', function (req, res, next) {
     console.log('notification')
     var certPath = admin.credential.cert(serviceAccount)
-var FCM = new fcm(certPath);
+    var FCM = new fcm(certPath);
     let target_token = 'cVOwZAV2JUM9qrRl9BGE5M:APA91bGFjfMfoSQnGMb7WTfdVAefN4QvyQLXeeHIIQu2N22fRpeqmpN70xW4IHK1MZytOzvJaFt_4RbwMIcxC_pu4hEzgvfBJ1sqBmhc4kfq1skz1GdGANqtaiRHHu7o62A_25BRMQoE'
       //target_token은 푸시 메시지를 받을 디바이스의 토큰값입니다
 

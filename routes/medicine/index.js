@@ -16,25 +16,29 @@ var storage = multer.diskStorage({
 })
 var upload = multer({storage:storage})
 router.post('/upload', upload.single("image"), function (req,res) {
-    const info = {
-        "email" : req.body['email'],
-        "medicine": JSON.stringify(req.body['medicine'].replace(" ", "").split(',')),
-        "day": req.body['day'],
-        "times": req.body['times'],
-        "image": req.file != undefined ? req.file.filename : null,
-    };
-    console.log(info);
-    var sql = 'INSERT INTO takingmedicine(email, medicine_name, days, times, image) VALUES(?,?,?,?,?)';
-    var params = [info['email'], info['medicine'], info['day'], info['times'], info['image']];
+    const medicineList = req.body['medicine'].replace(" ", "").split(',')
+    for( var medicine in medicineList ){
+        const info = {
+            "email" : req.body['email'],
+            "medicine": medicine,
+            "day": req.body['day'],
+            "times": req.body['times'],
+            "image": req.file != undefined ? req.file.filename : null,
+        };
+    
+        var sql = 'INSERT INTO takingmedicine(email, medicine_name, days, times, image) VALUES(?,?,?,?,?)';
+        var params = [info['email'], info['medicine'], info['day'], info['times'], info['image']];
+    
+        mdbConn.dbInsert(sql, params)
+        .then((rows) => {
+            if (!rows) res.status(500).send("false");
+            else res.status(200).send("true");
+        })
+        .catch((errMsg) => {
+            res.status(500).send(errMsg);
+        });
+    }
 
-    mdbConn.dbInsert(sql, params)
-    .then((rows) => {
-        if (!rows) res.status(500).send("false");
-        else res.status(200).send("true");
-    })
-    .catch((errMsg) => {
-        res.status(500).send(errMsg);
-    });
     
 })
 router.get('/parse', function(req, res){
