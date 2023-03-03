@@ -16,28 +16,31 @@ var storage = multer.diskStorage({
 })
 var upload = multer({storage:storage})
 router.post('/upload', upload.single("image"), function (req,res) {
-    const medicineList = req.body['medicine'].replace(" ", "").split(',')
-    for( var i = 0; i < medicineList.length; i++ ) {
-        const info = {
-            "email" : req.body['email'],
-            "medicine": medicineList[i],
-            "day": req.body['day'],
-            "times": req.body['times'],
-            "image": req.file != undefined ? req.file.filename : null,
-        };
-    
-        var sql = 'INSERT INTO takingmedicine(email, medicine_name, days, times, image) VALUES(?,?,?,?,?)';
-        var params = [info['email'], info['medicine'], info['day'], info['times'], info['image']];
-    
-        mdbConn.dbInsert(sql, params)
-        // .then((rows) => {
-        // })
-        // .catch((errMsg) => {
-        //     res.status(500).send(errMsg);
-        // });
+    let times_parse = JSON.parse(req.body['times'])
+    let times = []
+    for(var i=0; i <times_parse.length; i++){
+        times.push({time  :times_parse[i], check : false})
     }
-    res.send('true')
-    
+    console.log(times);
+    const info = {
+        "email" : req.body['email'],
+        "medicine": req.body['medicine'].replace(" ", "").split(',').join(', '),
+        "day": req.body['day'],
+        "times": JSON.stringify(times),
+        "image": req.file != undefined ? req.file.filename : null,
+    };
+
+    var sql = 'INSERT INTO takingmedicine(email, medicine_name, days, times, image) VALUES(?,?,?,?,?)';
+    var params = [info['email'], info['medicine'], info['day'], info['times'], info['image']];
+
+    mdbConn.dbInsert(sql, params)
+    .then((rows) => {
+        if(!rows) res.status(500).send('false')
+        else res.status(200).send('true')
+    })
+    .catch((errMsg) => {
+        res.status(500).send(errMsg);
+    });
 })
 router.get('/parse', function(req, res){
     let email = req.query.email
@@ -57,33 +60,32 @@ router.post('/check', function(req, res) {
     const info = {
         "email" : req.body['email'],
         'id' :  Number(req.body['id']),
-        'take' : Number(req.body['take'])
+        'take' : req.body['take'] == 'false' ? false : true
     };
-    var sql = 'UPDATE takingmedicine SET take = ?  WHERE email = ? AND id = ?'
-    var params = [info['take'], info['email'], info['id']];
-    mdbConn.dbInsert(sql, params)
-    .then((rows) => {
-        if (!rows) res.status(500).send("false");
-        else res.status(200).send("true");
-    })
-    .catch((errMsg) => {
-        res.status(500).send(errMsg);
-    });
-})
-
-router.post('/check', function(req, res) {
-    const info = {
-        "email" : req.body['email'],
-        'id' :  req.body['id'],
-        'take' : req.body['take']
-    };
-    var sql = 'UPDATE takingmedicine SET take = ?  WHERE email = ? AND id = ?'
-    var params = [info['take'], info['email'], info['id']];
-    mdbConn.dbInsert(sql, params)
-    .then((rows) => {
-        if (!rows) res.status(500).send("false");
-        else res.status(200).send("true");
-    })
+    var sql = 'SELECT times FROM takingmedicine WHERE email = ? AND id = ?'
+    var params = [info['email'], info['id']];
+    mdbConn.dbSelect(sql, params)
+    .then((row) => {
+        if (!row) res.status(500).send("false");
+        else{
+            let data = row['times']
+            for(var i = 0; i < data.length; i++){
+                if(data[i]['time'] == req.body['time']){
+                    data[i]['check'] = info['take']
+                }
+            }
+            var sql = 'UPDATE takingmedicine SET times = ?  WHERE email = ? AND id = ?'
+            var params = [JSON.stringify(data), info['email'], info['id']];
+            mdbConn.dbInsert(sql, params)
+            .then((rows) => {
+                if (!rows) res.status(500).send("false");
+                else res.status(200).send("true");
+            })
+            .catch((errMsg) => {
+                res.status(500).send(errMsg);
+            });
+        }
+    })            
     .catch((errMsg) => {
         res.status(500).send(errMsg);
     });
