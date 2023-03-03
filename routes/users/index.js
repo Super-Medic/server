@@ -42,7 +42,7 @@ router.post('/joinverify', (req, res) => {
   mdbConn.dbSelect(sql, info['email'])
     .then((rows) => {
       if (!rows) {
-        res.status(200).send("false");
+        res.status(500).send("false");
       }
       else res.status(200).send("true");
     })
