@@ -3,7 +3,7 @@ const router = express.Router();
 const admin = require('firebase-admin')
 const fcm = require('fcm-notification')
 var serviceAccount = require("./supermedic-56c64-firebase-adminsdk-u959y-6bf21d5500.json");
-
+const mdbConn = require('../../db_connection/mariaDBConn')
 router.get('/', function (req, res, next) {
     console.log('notification')
     var certPath = admin.credential.cert(serviceAccount)
@@ -47,16 +47,17 @@ router.post('/uploadToken', function (req, res, next) {
             var sql = 'INSERT INTO notificationtoken(email, TOKEN) VALUES(?,?)';
         }
         else{
-            console.log(row['TOKEN']);
             if (row['TOKEN'] == info['token']){
                 res.status(200).send("true");
+                return;
             }
             var sql = 'UPDATE notificationtoken SET TOKEN = ?  WHERE email = ?'
         }
         mdbConn.dbInsert(sql, params)
         .then((rows) => {
             if (!rows) res.status(500).send("false");
-            else res.status(200).send("true");
+            else {res.status(200).send("true")
+        };
         })
         .catch((errMsg) => {
             res.status(500).send(errMsg);

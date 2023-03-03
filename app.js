@@ -5,6 +5,14 @@ var app = express();
 require('dotenv').config();
 const routes = require('./routes');
 
+app.use((req, res, next) => {
+  if (req.secure) {
+    next();
+  } else {
+    const to = `https://${req.hostname}${req.url}`;
+    res.redirect(to);
+  }
+});
 
 /**
  * 후에 HYPHEN API 호출 시 토큰 사용을 위한 글로벌 변수 -> 현재는 USERID 와 HKEYf를 이용해 사용 중

@@ -17,10 +17,10 @@ var storage = multer.diskStorage({
 var upload = multer({storage:storage})
 router.post('/upload', upload.single("image"), function (req,res) {
     const medicineList = req.body['medicine'].replace(" ", "").split(',')
-    for( var medicine in medicineList ){
+    for( var i = 0; i < medicineList.length; i++ ) {
         const info = {
             "email" : req.body['email'],
-            "medicine": medicine,
+            "medicine": medicineList[i],
             "day": req.body['day'],
             "times": req.body['times'],
             "image": req.file != undefined ? req.file.filename : null,
@@ -30,29 +30,45 @@ router.post('/upload', upload.single("image"), function (req,res) {
         var params = [info['email'], info['medicine'], info['day'], info['times'], info['image']];
     
         mdbConn.dbInsert(sql, params)
-        .then((rows) => {
-            if (!rows) res.status(500).send("false");
-            else res.status(200).send("true");
-        })
-        .catch((errMsg) => {
-            res.status(500).send(errMsg);
-        });
+        // .then((rows) => {
+        // })
+        // .catch((errMsg) => {
+        //     res.status(500).send(errMsg);
+        // });
     }
-
+    res.send('true')
     
 })
 router.get('/parse', function(req, res){
     let email = req.query.email
-    let sql = 'SELECT medicine_name, days, times  FROM takingmedicine WHERE email=?'
+    console.log(email)
+    let sql = 'SELECT id, medicine_name, days, times, take  FROM takingmedicine WHERE email=?'
     mdbConn.dbSelectall(sql, email)
     .then((rows) => {
         if(!rows) res.status(200).send('Empty')
-        console.log("parse arrive");
-        res.status(200).send(rows)
-    }).catch((err) => {
+        else res.send(rows)
+    })
+    .catch((err) => {
         res.status(500).send(err);
     })
+})
 
+router.post('/check', function(req, res) {
+    const info = {
+        "email" : req.body['email'],
+        'id' :  Number(req.body['id']),
+        'take' : Number(req.body['take'])
+    };
+    var sql = 'UPDATE takingmedicine SET take = ?  WHERE email = ? AND id = ?'
+    var params = [info['take'], info['email'], info['id']];
+    mdbConn.dbInsert(sql, params)
+    .then((rows) => {
+        if (!rows) res.status(500).send("false");
+        else res.status(200).send("true");
+    })
+    .catch((errMsg) => {
+        res.status(500).send(errMsg);
+    });
 })
 
 router.post('/check', function(req, res) {
