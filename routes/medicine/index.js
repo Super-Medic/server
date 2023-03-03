@@ -23,6 +23,7 @@ router.post('/upload', upload.single("image"), function (req,res) {
         "times": req.body['times'],
         "image": req.file != undefined ? req.file.filename : null,
     };
+    console.log(info);
     var sql = 'INSERT INTO takingmedicine(email, medicine_name, days, times, image) VALUES(?,?,?,?,?)';
     var params = [info['email'], info['medicine'], info['day'], info['times'], info['image']];
 
