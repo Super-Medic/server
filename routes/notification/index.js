@@ -2,15 +2,14 @@ const express = require('express');
 const router = express.Router();
 const admin = require('firebase-admin')
 const fcm = require('fcm-notification')
-var serviceAccount = require("./supermedic-56c64-firebase-adminsdk-u959y-6bf21d5500.json");
+var serviceAccount = require("./supermedic-56c64-firebase-adminsdk-u959y-a7261b00e5.json");
 const mdbConn = require('../../db_connection/mariaDBConn')
 router.get('/', function (req, res, next) {
     console.log('notification')
     var certPath = admin.credential.cert(serviceAccount)
     var FCM = new fcm(certPath);
-    let target_token = 'cVOwZAV2JUM9qrRl9BGE5M:APA91bGFjfMfoSQnGMb7WTfdVAefN4QvyQLXeeHIIQu2N22fRpeqmpN70xW4IHK1MZytOzvJaFt_4RbwMIcxC_pu4hEzgvfBJ1sqBmhc4kfq1skz1GdGANqtaiRHHu7o62A_25BRMQoE'
+    let target_token = 'eMQ7WE2SRvCxb_e6wrvLb0:APA91bGkZHHDQP8bd9TA0_dH2ANts00EeARdD-wM9qLJS3gf95Dm06FuEz4TMXQAbQG4EBsws6lcpGK5e0-ZxYbAIhrC2FAL6g65y4RWI9LyNZFHi2lPxx7Y3hicFgYkNtediFQxY0JD'
       //target_token은 푸시 메시지를 받을 디바이스의 토큰값입니다
-
     let message = {
         notification : {
             title : ' hi123',
@@ -21,16 +20,7 @@ router.get('/', function (req, res, next) {
         },
         token : target_token
     }
-    FCM.send(message, function(err, res){
-        if(err){
-            return res.status(500).send({
-                message : err
-            })
-        }
-        else{
-            return res.status(200).send({message : 'Notification Sent'})
-        }
-    });
+    FCM.send(message);
 })
 
 router.post('/uploadToken', function (req, res, next) {
