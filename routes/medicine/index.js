@@ -43,9 +43,10 @@ router.post('/upload', upload.single("image"), function (req,res) {
     });
 })
 router.get('/parse', function(req, res){
+    console.log('asdasd');
     let email = req.query.email
     console.log(email)
-    let sql = 'SELECT id, medicine_name, days, times, take  FROM takingmedicine WHERE email=?'
+    let sql = 'SELECT id, medicine_name, days, times  FROM takingmedicine WHERE email=?'
     mdbConn.dbSelectall(sql, email)
     .then((rows) => {
         if(!rows) res.status(200).send('Empty')

@@ -66,12 +66,6 @@ router.post('/uploadToken', function (req, res, next) {
     .catch((errMsg) => {
         res.status(500).send(errMsg);
     });        
-
-
-
-
-
-
 })
 
 module.exports = router;
