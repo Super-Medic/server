@@ -5,46 +5,33 @@
  */
 
 var app = require('../app');
-var debug = require('debug')('mypd:server');
-// var http = require('http');
-var https = require('https');
-const fs = require('fs');
+var http = require('http');
+
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '5000');
+var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
-const options = {
-	key: fs.readFileSync('./keys/server.key'),
-  cert: fs.readFileSync('./keys/ssl.crt'),
-  ca : [fs.readFileSync('./keys/chain_ssl.crt'),
-        fs.readFileSync('./keys/chain_all_ssl.crt')
-      ]
-};
-var server = https.createServer(options,app);
-// var server = http.createServer(app);
+
+var server = http.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port,() => {
-  console.log("HTTPS 서버 가동중")
-});
-app.listen(5001, () => {
-  console.log("HTTP 서버 가동중")
-})
+server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
 /**
  * Normalize a port into a number, string, or false.
  */
+
 function normalizePort(val) {
   var port = parseInt(val, 10);
 
@@ -98,5 +85,4 @@ function onListening() {
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
-  debug('Listening on ' + bind);
 }
