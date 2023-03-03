@@ -55,5 +55,23 @@ router.get('/parse', function(req, res){
 
 })
 
+router.post('/check', function(req, res) {
+    const info = {
+        "email" : req.body['email'],
+        'id' :  req.body['id'],
+        'take' : req.body['take']
+    };
+    var sql = 'UPDATE takingmedicine SET take = ?  WHERE email = ? AND id = ?'
+    var params = [info['take'], info['email'], info['id']];
+    mdbConn.dbInsert(sql, params)
+    .then((rows) => {
+        if (!rows) res.status(500).send("false");
+        else res.status(200).send("true");
+    })
+    .catch((errMsg) => {
+        res.status(500).send(errMsg);
+    });
+})
+
 
 module.exports = router;
