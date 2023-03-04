@@ -36,8 +36,8 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
 });
 
-
-const job = schedule.scheduleJob('0 0 * * *', function () {
+// 12시 복약 내역 저장
+schedule.scheduleJob('0 0 * * *', function () {
   let today = new Date();
 
   let year = today.getFullYear(); // 년도
@@ -74,7 +74,8 @@ const job = schedule.scheduleJob('0 0 * * *', function () {
 
 })
 
-const job2 = schedule.scheduleJob(' */1 * * * *', function () {
+// 알림 보내기
+schedule.scheduleJob(' */1 * * * *', function () {
   var time_date = new Date();
 
   // 현재 시간 불러오기 HH:MM
