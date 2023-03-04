@@ -77,7 +77,7 @@ router.post('/loginselect', (req, res) => {
     "email": req.body.account_email,
   };
 
-  var sql = 'Select name, phone_number, birthday, gender FROM Users WHERE email=?'
+  var sql = 'Select name, phone_number, telecom, birthday, gender FROM Users WHERE email=?'
   mdbConn.dbSelect(sql, info['email'])
     .then((result) => {
       res.status(200).json(result);
