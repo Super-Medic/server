@@ -2,9 +2,6 @@ const express = require('express');
 const router = express.Router();
 const mdbConn = require('../../db_connection/mariaDBConn')
 
-
-
-
 router.post('/uploadToken', function (req, res, next) {
     const info = {
         "email": req.body['email'],
