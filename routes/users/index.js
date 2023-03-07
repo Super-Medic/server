@@ -2,6 +2,8 @@ var express = require('express')
 const mdbConn = require('../../db_connection/mariaDBConn')
 var router = express.Router();
 require("dotenv").config();
+const apple = require("./apple");
+router.use("/apple", apple);
 
 
 /**
