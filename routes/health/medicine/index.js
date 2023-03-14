@@ -14,8 +14,8 @@ router.post('/init', (req, res, next) => {
     let bodyData = makeBodyData(req.body)
     bodyData['subjectType'] = req.body.subjectType
     bodyData['detailYn'] = 'Y'
-
     postAPIfunction(url, bodyData).then((resAPI) => {
+
         res.send(JSON.parse(resAPI)['data'].stepData);
     }).catch((err) => {
         console.log('medicine/init', err);
@@ -25,14 +25,13 @@ router.post('/init', (req, res, next) => {
 
 router.post('/sign', (req, res, next) => {
     const url = 'https://api.hyphen.im/in0002000428'
-    let bodyData = makeBodyData(req.body)
+    let bodyData = makeBodyData(req.body) 
     bodyData['subjectType'] = req.body.subjectType
     bodyData['detailYn'] = 'Y'
     postAPIfunction(url, bodyData).then((resAPI) => {
+
         let parseData = new makeParsingClass(JSON.parse(resAPI)['data']['list']);
-        console.log(parseData);
         let data = parseData.getDataByKeyListInListInList('sublist','medList',keyList)
-        console.log(data);
         for(let i = 0; i < data.length; i++) {
             for(let j = 0; j < data[i]['medList'].length; j++) { // 의약품 상세 정보 제거 및 불필요 정보 delete
                 insertMedicineDetail(data[i]['medList'][j]['detailObj'])

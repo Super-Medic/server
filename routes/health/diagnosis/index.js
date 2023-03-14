@@ -13,7 +13,6 @@ const keyList =['No', 'pharmNm','diagType', 'diagSdate'];
 router.post('/init', (req, res, next) => {
     const url = 'https://api.hyphen.im/in0002000427'
     let bodyData = makeBodyData(req.body)
-    console.log(bodyData)
 
     bodyData['subjectType'] = req.body.subjectType
     bodyData['fromDate'] = req.body.birthday
@@ -34,7 +33,6 @@ router.post('/sign',  (req, res, next) => {
     bodyData['subjectType'] = req.body.subjectType
     bodyData['fromDate'] = req.body.birthday
     bodyData['toDate'] = newDate.toFormat('YYYYMMDD')
-    console.log(bodyData)
 
     postAPIfunction(url, bodyData).then((resAPI) => {
         let parseData = new makeParsingClass(JSON.parse(resAPI)['data']['list'])

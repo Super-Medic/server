@@ -22,7 +22,6 @@ const keyList = ["screeningDate", "kidney", "weight", "waist", "BMI", "vision", 
 router.post('/init', (req, res, next) => {
     let url = 'https://api.hyphen.im/in0002000432'
     let bodyData = makeBodyData(req.body)
-    console.log(bodyData)
 
     postAPIfunction(url, bodyData).then((resAPI) => {
         res.send(JSON.parse(resAPI)['data'].stepData);
@@ -34,11 +33,9 @@ router.post('/init', (req, res, next) => {
 router.post('/sign', (req, res, next) => {
     let url = 'https://api.hyphen.im/in0002000432'
     let bodyData = makeBodyData(req.body)
-    console.log(bodyData)
 
     postAPIfunction(url, bodyData).then((resAPI) => {
         let parseData = new makeParsingClass(JSON.parse(resAPI)['data']['list']);
-    console.log(parseData)
     let sendRes = []
         for(let i = 0; i < parseData.Count; i++){
             sendRes.push(Object.assign(
