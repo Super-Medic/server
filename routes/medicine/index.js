@@ -4,6 +4,8 @@ const fs = require('fs');
 var multer  = require('multer')
 const path = require('path');
 const mdbConn = require('../../db_connection/mariaDBConn')
+const parse = require("./parse");
+router.use("/parse", parse);
 
 var storage = multer.diskStorage({ 
     destination: function(request, file, cb) { // 저장위치설정 
@@ -42,19 +44,6 @@ router.post('/upload', upload.single("image"), function (req,res) {
         res.status(500).send(errMsg);
     });
 })
-router.get('/parse', function(req, res){
-    let email = req.query.email
-    let sql = 'SELECT id, medicine_name, days, times  FROM takingmedicine WHERE email=?'
-    mdbConn.dbSelectall(sql, email)
-    .then((rows) => {
-        if(!rows) res.status(500).send('Empty')
-        else res.send(rows)
-    })
-    .catch((err) => {
-        console.log('medicine/parse', errMsg);
-        res.status(500).send(err);
-    })
-})
 
 router.post('/check', function(req, res) {
     const info = {
@@ -91,6 +80,7 @@ router.post('/check', function(req, res) {
         res.status(500).send(errMsg);
     });
 })
+
 router.post('/delete', (req, res) => {
     const info = {
         "email" : req.body['email'],
