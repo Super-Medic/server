@@ -89,6 +89,21 @@ router.post('/check', function(req, res) {
         res.status(500).send(errMsg);
     });
 })
-
+router.post('/delete', (req, res) => {
+    const info = {
+        "email" : req.body['email'],
+        "medicine" : req.body['medicine'],
+    };
+    let sql = "DELETE FROM takingmedicine WHERE email = ? AND medicine = ?"
+    let params = [info['email'], info['medicine']];
+    mdbConn.dbSelect(sql, params)
+    .then((res) => {
+        if (!row) res.status(500).send("false");
+        else res.status(200).send("true");
+    })
+    .catch((errMsg) => {
+        res.status(500).send(errMsg);
+    })
+});
 
 module.exports = router;
