@@ -18,7 +18,7 @@ router.post('/init', (req, res, next) => {
     postAPIfunction(url, bodyData).then((resAPI) => {
         res.send(JSON.parse(resAPI)['data'].stepData);
     }).catch((err) => {
-        console.log('error = ' + err);
+        console.log('medicine/init', err);
         res.status(500).end()
     });
 });
@@ -46,7 +46,7 @@ router.post('/sign', (req, res, next) => {
         res.send({medicineList : data});
 
     }).catch((err) => {
-        console.log('error = ' + err);
+        console.log('medicine/sign', err);
         res.status(500).end()
     });
 });

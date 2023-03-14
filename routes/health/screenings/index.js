@@ -27,7 +27,7 @@ router.post('/init', (req, res, next) => {
     postAPIfunction(url, bodyData).then((resAPI) => {
         res.send(JSON.parse(resAPI)['data'].stepData);
     }).catch((err) => {
-        console.log('error = ' + err);
+        console.log('screening/init', err);
         res.status(500).end()
     });
 });
@@ -49,7 +49,7 @@ router.post('/sign', (req, res, next) => {
         res.send({ screeningList : sendRes})
 
     }).catch((err) => {
-        console.log('error = ' + err);
+        console.log('screening/sign', err);
         res.status(500).end()
     });
 });

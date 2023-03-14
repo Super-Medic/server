@@ -13,7 +13,7 @@ router.post('/', (req, res, next) => {
     postAPIfunction(url, bodyData).then((resAPI) => {
         res.send(JSON.parse(resAPI))
     }).catch((err) => {
-        console.log('error = ' + err);
+        console.log('baby/init', err);
         res.status(500).end()
     });
 });
