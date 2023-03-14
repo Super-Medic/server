@@ -39,11 +39,9 @@ router.post("/sign_in_with_apple", async (request, response) => {
         process.env.KEY_CONTENTS.replace(/\|/g, "\n"),
         "text"
     );
-    console.log(request.query);
     const accessToken = await auth.accessToken(request.query.code);
     const idToken = jwt.decode(accessToken.id_token);
     // const userID = idToken.sub;
-    console.log(idToken);
     // `userEmail` and `userName` will only be provided for the initial authorization with your app
     const userEmail = idToken.email;
     // const userName = `${request.query.firstName} ${request.query.lastName}`;

@@ -21,7 +21,6 @@ router.post('/upload', upload.single("image"), function (req,res) {
     for(var i=0; i <times_parse.length; i++){
         times.push({time  :times_parse[i], check : false})
     }
-    console.log(times);
     const info = {
         "email" : req.body['email'],
         "medicine": req.body['medicine'].replace(" ", "").split(',').join(', '),
@@ -39,6 +38,7 @@ router.post('/upload', upload.single("image"), function (req,res) {
         else res.status(200).send('true')
     })
     .catch((errMsg) => {
+        console.log('medicine/upload', errMsg);
         res.status(500).send(errMsg);
     });
 })
@@ -51,6 +51,7 @@ router.get('/parse', function(req, res){
         else res.send(rows)
     })
     .catch((err) => {
+        console.log('medicine/parse', errMsg);
         res.status(500).send(err);
     })
 })
@@ -86,6 +87,7 @@ router.post('/check', function(req, res) {
         }
     })            
     .catch((errMsg) => {
+        console.log('medicine/check', errMsg);
         res.status(500).send(errMsg);
     });
 })
@@ -102,6 +104,7 @@ router.post('/delete', (req, res) => {
         else res.status(200).send("true");
     })
     .catch((errMsg) => {
+        console.log('medicine/delete', errMsg);
         res.status(500).send(errMsg);
     })
 });

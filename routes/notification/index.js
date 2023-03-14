@@ -30,10 +30,12 @@ router.post('/uploadToken', function (req, res, next) {
                     };
                 })
                 .catch((errMsg) => {
+                    console.log('notification/uploadToken1', errMsg);
                     res.status(500).send(errMsg);
                 });
         })
         .catch((errMsg) => {
+            console.log('notification/uploadToken2', errMsg);
             res.status(500).send(errMsg);
         });
 })

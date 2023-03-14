@@ -28,6 +28,7 @@ router.post('/join', (req, res) => {
       else res.status(200).send("true");
     })
     .catch((errMsg) => {
+      console.log('user/join', errMsg);
       res.status(500).send(errMsg);
     });
 });
@@ -49,6 +50,7 @@ router.post('/joinverify', (req, res) => {
       else res.status(200).send("true");
     })
     .catch((errMsg) => {
+      console.log('user/joinverify', errMsg);
       res.status(500).send(errMsg);
     });
 });
@@ -67,6 +69,7 @@ router.post('/secession', (req, res) => {
       res.status(200).send("true");
     })
     .catch((errMsg) => {
+      console.log('user/secession', errMsg);
       res.status(500).send(errMsg);
     });
 });
@@ -85,6 +88,7 @@ router.post('/loginselect', (req, res) => {
       res.status(200).json(result);
     })
     .catch((errMsg) => {
+      console.log('user/loginselect', errMsg);
       res.status(500).send(errMsg);
     });
 });
