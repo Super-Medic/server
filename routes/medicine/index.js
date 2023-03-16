@@ -84,14 +84,14 @@ router.post('/check', function(req, res) {
 router.post('/delete', (req, res) => {
     const info = {
         "email" : req.body['email'],
-        "medicine" : req.body['medicine'],
+        "id" : req.body['id'],
     };
-    let sql = "DELETE FROM takingmedicine WHERE email = ? AND medicine = ?"
-    let params = [info['email'], info['medicine']];
+
+    let sql = "DELETE FROM takingmedicine WHERE email = ? AND id = ?"
+    let params = [info['email'], info['id']];
     mdbConn.dbSelect(sql, params)
-    .then((res) => {
-        if (!row) res.status(500).send("false");
-        else res.status(200).send("true");
+    .then((row) => {
+        res.status(200).send("true");
     })
     .catch((errMsg) => {
         console.log('medicine/delete', errMsg);

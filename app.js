@@ -39,30 +39,51 @@ app.use(function (err, req, res, next) {
 // 12시 복약 내역 저장
 schedule.scheduleJob('0 0 * * *', function () {
   let today = new Date();
-
   let year = today.getFullYear(); // 년도
-  let month = today.getMonth() + 1;  // 월
+  let month = today.getMonth()
   let date = today.getDate() - 1;  // 날짜
-  let day = year + '-' + month + '-' + date
-
+  if(date == 0){
+    if((month == 1) || (month == 3) || (month == 5) || (month == 7) || (month == 8) || (month == 10) ){
+      date = 31
+    }
+    else if((month == 12)){
+      year -= 1;
+      date = 31
+    }
+    else if((month == 2)){
+      date = new Date(year,2,0).getDate(); 
+    }
+    else{
+      date = 30
+    }
+    month = ('0' + today.getMonth()).slice(-2);  
+  }
+  else{
+    month = ('0' + (today.getMonth() + 1)).slice(-2);
+  }
+  let day = year + '-' + month + '-' + ('0' + date).slice(-2);
+  let weekday = new Date(year, month-1, date);
+  weekday = weekday.getDay()
+  
   var sql = 'SELECT email FROM Users'
   mdbConn.dbSelectall(sql, [])
     .then((rows) => {
       for (var i = 0; i < rows.length; i++) {
-        var sql = 'SELECT id, medicine_name, times FROM takingmedicine WHERE email = ?'
+        var sql = 'SELECT id, medicine_name, times, days FROM takingmedicine WHERE email = ?'
         let email = rows[i]['email']
         mdbConn.dbSelectall(sql, email)
           .then((rows) => {
             let jsonData = {}
             for (var j = 0; j < rows.length; j++) {
-              jsonData[rows[j]['medicine_name']] = rows[j]['times']
-              for (var k = 0; k < rows[j]['times'].length; k++) {
-                rows[j]['times'][k]['check'] = false
-              }
-              // console.log(rows[j]['times'])
-              var sql = 'UPDATE takingmedicine SET times = ?  WHERE id = ?'
-              var params = [JSON.stringify(rows[j]['times']), rows[j]['id']]
+              if(rows[j]['days'].includes(weekday)){
+                jsonData[rows[j]['medicine_name']] = rows[j]['times']
+                for (var k = 0; k < rows[j]['times'].length; k++) {
+                  rows[j]['times'][k]['check'] = false
+                }
+                var sql = 'UPDATE takingmedicine SET times = ?  WHERE id = ?'
+                var params = [JSON.stringify(rows[j]['times']), rows[j]['id']]
               mdbConn.dbInsert(sql, params)
+              }
             }
             var sql = 'INSERT INTO medicinetake(email, date, takeinfo) VALUES(?,?,?)';
             var params = [email, day, jsonData]
@@ -71,7 +92,6 @@ schedule.scheduleJob('0 0 * * *', function () {
       }
       console.log(day, '투약정보 저장 완료')
     })
-
 })
 
 // 알림 보내기

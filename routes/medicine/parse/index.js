@@ -17,7 +17,7 @@ router.get('/current', function(req, res){
 })
 router.get('/past', function(req, res){
     let email = req.query.email
-    let sql = 'SELECT takeinfo FROM takingmedicine WHERE email=?'
+    let sql = 'SELECT date, takeinfo FROM medicinetake WHERE email=?'
     mdbConn.dbSelectall(sql, email)
     .then((rows) => {
         if(!rows) res.status(500).send('Empty')
@@ -28,3 +28,4 @@ router.get('/past', function(req, res){
         res.status(500).send(err);
     })
 })
+module.exports = router;
