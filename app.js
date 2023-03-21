@@ -95,15 +95,9 @@ schedule.scheduleJob('0 0 * * *', function () {
 
 })
 
-// 알림 보내기
+//알림 보내기
 schedule.scheduleJob(' */1 * * * *', function () {
-  var time_date = new Date();
 
-  // 현재 시간 불러오기 HH:MM
-  var nowHour = time_date.getHours();
-  var nowMinute = String(time_date.getMinutes()).padStart(2, "0");
-  if (nowHour == 0) nowHour += 12;
-  var nowTime = String(nowHour) + ":" + nowMinute;
 
   var sql = 'SELECT email,TOKEN FROM notificationtoken'
   mdbConn.dbSelectall(sql, [])
@@ -113,36 +107,9 @@ schedule.scheduleJob(' */1 * * * *', function () {
       for (var i = 0; i < notification.length; i++) {
         let email = notification[i]['email'];
         let token = notification[i]['TOKEN'];
-        let notYetSend = true
-        let j = 0
-        mdbConn.dbSelectall(take_when, email).then((when) => {
-          while(notYetSend){
-            if ((when[j]['days'].includes(time_date.getDay()))) {
-              for (var k = 0; k < when[j]['times'].length; k++) {
-                if (when[j]['times'][k]['check'] == false) {
 
-                  // 약 복용 시간 불러오기 HH:MM
-                  var takingTimeHour = when[j]['times'][k]['time'].split(" ")[0].split(":")[0];
-                  var takingTimeMinute = when[j]['times'][k]['time'].split(" ")[0].split(":")[1];
-                  if ((when[j]['times'][k]['time'].slice(-2, when[j]['times'][k]['time'].length) == "PM") && (when[j]['times'][k]['time'].slice(2, when[j]['times'][k]['time'].length) != "12"))
-                    takingTimeHour = Number(takingTimeHour) + 12;
-                  var takingTime = String(takingTimeHour) + ":" + takingTimeMinute;
-                  j+=1
-                  if(j < when.length) notYetSend = false;
-                  if (nowTime == takingTime) {
-                    try {
-                      sendPushNotification(token, "슈퍼메딕", "약 복용 시간입니다");
-                    }
-                    catch {
-                      console.log(email, "알림 에러");
-                      continue
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        mdbConn.dbSelectall(take_when, email).then((when) => 
+          notificationHandler(when, token )
         ).catch((err) => {
           console.log(err);
         });
@@ -152,6 +119,41 @@ schedule.scheduleJob(' */1 * * * *', function () {
     });
 })
 
+function notificationHandler(when, token){
+  var time_date = new Date();
+
+  // 현재 시간 불러오기 HH:MM
+  var nowHour = time_date.getHours();
+  var nowMinute = String(time_date.getMinutes()).padStart(2, "0");
+  if (nowHour == 0) nowHour += 12;
+  var nowTime = String(nowHour) + ":" + nowMinute;
+  
+  for (var j = 0; j < when.length; j++) {
+    if ((when[j]['days'].includes(time_date.getDay()))) {
+      for (var k = 0; k < when[j]['times'].length; k++) {
+        if (when[j]['times'][k]['check'] == false) {
+
+          // 약 복용 시간 불러오기 HH:MM
+          var takingTimeHour = when[j]['times'][k]['time'].split(" ")[0].split(":")[0];
+          var takingTimeMinute = when[j]['times'][k]['time'].split(" ")[0].split(":")[1];
+          if ((when[j]['times'][k]['time'].slice(-2, when[j]['times'][k]['time'].length) == "PM") && (when[j]['times'][k]['time'].slice(0, 2) != "12"))
+            takingTimeHour = Number(takingTimeHour) + 12;
+          var takingTime = String(takingTimeHour) + ":" + takingTimeMinute;
+          if (nowTime == takingTime) {
+            try {
+              console.log("send")
+              sendPushNotification(token, "슈퍼메딕", "약 복용 시간입니다");
+              return
+            }
+            catch {
+              continue
+            }
+          }
+        }
+      }
+    }
+  }
+}
 
 function sendPushNotification(target_token, title, body) {
   //target_token은 푸시 메시지를 받을 디바이스의 토큰값입니다
