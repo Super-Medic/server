@@ -131,6 +131,7 @@ schedule.scheduleJob(' */1 * * * *', function () {
                       sendPushNotification(token, "슈퍼메딕", "약 복용 시간입니다");
                     }
                     catch {
+                      console.log(email, "알림 에러");
                       continue
                     }
                   }
@@ -154,12 +155,21 @@ function sendPushNotification(target_token, title, body) {
   let message = {
     notification: {
       title: title,
-      body: body
+      body: body,
     },
     data: {
       route: 'splash'
     },
-    token: target_token
+    token: target_token,
+    apns: {
+      payload: {
+          aps: {
+            badge: 2.0,
+            "apns-priority": 5,
+              sound: 'default'
+          },
+      },
+  },
   }
   FCM.send(message, () => {
     console.log("success");
