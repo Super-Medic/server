@@ -92,6 +92,7 @@ schedule.scheduleJob('0 0 * * *', function () {
       }
       console.log(day, '투약정보 저장 완료')
     })
+
 })
 
 // 알림 보내기
@@ -112,10 +113,10 @@ schedule.scheduleJob(' */1 * * * *', function () {
       for (var i = 0; i < notification.length; i++) {
         let email = notification[i]['email'];
         let token = notification[i]['TOKEN'];
-
+        let notYetSend = true
+        let j = 0
         mdbConn.dbSelectall(take_when, email).then((when) => {
-
-          for (var j = 0; j < when.length; j++) {
+          while(notYetSend){
             if ((when[j]['days'].includes(time_date.getDay()))) {
               for (var k = 0; k < when[j]['times'].length; k++) {
                 if (when[j]['times'][k]['check'] == false) {
@@ -126,6 +127,8 @@ schedule.scheduleJob(' */1 * * * *', function () {
                   if ((when[j]['times'][k]['time'].slice(-2, when[j]['times'][k]['time'].length) == "PM") && (when[j]['times'][k]['time'].slice(2, when[j]['times'][k]['time'].length) != "12"))
                     takingTimeHour = Number(takingTimeHour) + 12;
                   var takingTime = String(takingTimeHour) + ":" + takingTimeMinute;
+                  j+=1
+                  if(j < when.length) notYetSend = false;
                   if (nowTime == takingTime) {
                     try {
                       sendPushNotification(token, "슈퍼메딕", "약 복용 시간입니다");
