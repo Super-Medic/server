@@ -7,10 +7,11 @@ const routes = require('./routes');
 const schedule = require('node-schedule');
 const mdbConn = require('./db_connection/mariaDBConn');
 const admin = require('firebase-admin');
-const fcm = require('fcm-notification');
 var serviceAccount = require("./supermedic-56c64-firebase-adminsdk-u959y-c13e993edb.json");
 var certPath = admin.credential.cert(serviceAccount)
-var FCM = new fcm(certPath);
+admin.initializeApp({
+  credential : certPath
+});
 /**
  * 후에 HYPHEN API 호출 시 토큰 사용을 위한 글로벌 변수 -> 현재는 USERID 와 HKEYf를 이용해 사용 중
  */
@@ -155,6 +156,7 @@ function notificationHandler(when, token){
   }
 }
 
+
 function sendPushNotification(target_token, title, body) {
   //target_token은 푸시 메시지를 받을 디바이스의 토큰값입니다
   let message = {
@@ -164,6 +166,12 @@ function sendPushNotification(target_token, title, body) {
     },
     data: {
       route: 'splash'
+    },
+    android:{
+      priority:"high",
+      notification: {
+        channelId:'1:585309393841:android:2940a96afa932465df6390'
+    }
     },
     token: target_token,
     apns: {
@@ -176,9 +184,10 @@ function sendPushNotification(target_token, title, body) {
       },
   },
   }
-  FCM.send(message, () => {
+  admin.messaging().send(message)
+  .then(()=> {
     console.log("success");
-  });
+  })
 }
 
 module.exports = app;
