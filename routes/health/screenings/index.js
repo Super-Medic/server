@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const {postAPIfunction, makeBodyData} = require('../../../controller/forAPI');
-const {makeParsingClass, korToEng} = require('../../../controller/dataParse');
+const {makeParsingClass} = require('../../../controller/dataParse');
+const {changeObjectKeys} = require('../../../controller/utils');
 const baby = require('./baby');
 
 /**
@@ -40,7 +41,7 @@ router.post('/sign', (req, res, next) => {
         for(let i = 0; i < parseData.Count; i++){
             sendRes.push(Object.assign(
                 parseData.getDataByKeyList(basicKey, i), 
-                korToEng(parseData.getDataByKeyValueInList('chkResult','result', 'inspectItem' ,valueList, i),keyList))
+                changeObjectKeys(parseData.getDataByKeyValueInList('chkResult','result', 'inspectItem' ,valueList, i),keyList))
             );
         }
         res.send({ screeningList : sendRes})

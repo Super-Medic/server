@@ -1,17 +1,37 @@
 const mdbConn = require('../db_connection/mariaDBConn')
 
+/**
+ * 키 리스트 인자에 대응하는 value들을 return
+ * @param {list} list 
+ * @param {list} keyList 
+ * @returns List
+ */
 function getDataByKeyListFunc(list, keyList){
     let returnData = {};
     for(let i=0;i<keyList.length;i++)
         returnData[keyList[i]] = list[keyList[i]]
     return returnData
 }
+
+/**
+ * key와 value가 대응한다면 returnkey에 대응하는 value return
+ * @param {lust} list 
+ * @param {string} returnKey 
+ * @param {string} key 
+ * @param {string} value 
+ * @returns 
+ */
 function getDataByKeyValueFunc(list,returnKey, key , value){
     if(list[key] == value){
         return (returnKey != null ? list[returnKey] : list);
     }
     return
 }
+
+/**
+ * 복약 상세 내역 저장
+ * @param {JSON} data 
+ */
 async function insertMedicineDetail(data){
     let sql = 'SELECT medicineNm FROM medicine WHERE medicineNm=?'
     let sql2 = 'INSERT INTO medicine(medicineNm, detail) VALUES(?, ?)'
@@ -36,7 +56,6 @@ async function insertMedicineDetail(data){
         res.status(500).send(err)
     })
 }
-
 
 /**
  * data : JSON['data']['list']
@@ -72,7 +91,7 @@ class makeParsingClass{
      */
     getDataByKeyValue(key, value, returnKey = null, idx = 0){
         let parseData = this.data[idx];
-        getDataByKeyValueFunc(parseData, returnKey, key,value)
+        getDataByKeyValueFunc(parseData, returnKey, key, value)
     }
 
     /**
@@ -142,19 +161,8 @@ class makeParsingClass{
         return returnList;
     }
 }
-function korToEng(jsonObject, keyList){
-    const keys = Object.keys(jsonObject);
-    let idx = 0;
-    keys.forEach((key) => {
-        var newKey = keyList[idx++];
-        jsonObject[newKey] = jsonObject[key];
-        delete jsonObject[key];
-    });
-    return jsonObject
-}
 
 module.exports = {
     makeParsingClass : makeParsingClass,
     insertMedicineDetail : insertMedicineDetail,
-    korToEng : korToEng
 }
