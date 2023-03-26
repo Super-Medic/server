@@ -8,6 +8,7 @@ const schedule = require('node-schedule');
 const mdbConn = require('./db_connection/mariaDBConn');
 const admin = require('firebase-admin');
 var serviceAccount = require("./supermedic-56c64-firebase-adminsdk-u959y-c13e993edb.json");
+var {toStringByFormatting} = require('./controller/utils');
 var certPath = admin.credential.cert(serviceAccount)
 admin.initializeApp({
   credential : certPath
@@ -40,32 +41,8 @@ app.use(function (err, req, res, next) {
 // 12시 복약 내역 저장
 schedule.scheduleJob('0 0 * * *', function () {
   let today = new Date();
-  let year = today.getFullYear(); // 년도
-  let month = today.getMonth()
-  let date = today.getDate() - 1;  // 날짜
-  if(date == 0){
-    if((month == 1) || (month == 3) || (month == 5) || (month == 7) || (month == 8) || (month == 10) ){
-      date = 31
-    }
-    else if((month == 12)){
-      year -= 1;
-      date = 31
-    }
-    else if((month == 2)){
-      date = new Date(year,2,0).getDate(); 
-    }
-    else{
-      date = 30
-    }
-    month = ('0' + today.getMonth()).slice(-2);  
-  }
-  else{
-    month = ('0' + (today.getMonth() + 1)).slice(-2);
-  }
-  let day = year + '-' + month + '-' + ('0' + date).slice(-2);
-  let weekday = new Date(year, month-1, date);
-  weekday = weekday.getDay()
-  
+  let yesterday = new Date(today.setDate(today.getDate() - 1)).getDay();
+  let recordDate = toStringByFormatting(yesterdate);
   var sql = 'SELECT email FROM Users'
   mdbConn.dbSelectall(sql, [])
     .then((rows) => {
@@ -76,7 +53,7 @@ schedule.scheduleJob('0 0 * * *', function () {
           .then((rows) => {
             let jsonData = {}
             for (var j = 0; j < rows.length; j++) {
-              if(rows[j]['days'].includes(weekday)){
+              if(rows[j]['days'].includes(yesterday)){
                 jsonData[rows[j]['medicine_name']] = rows[j]['times']
                 for (var k = 0; k < rows[j]['times'].length; k++) {
                   rows[j]['times'][k]['check'] = false
@@ -87,18 +64,17 @@ schedule.scheduleJob('0 0 * * *', function () {
               }
             }
             var sql = 'INSERT INTO medicinetake(email, date, takeinfo) VALUES(?,?,?)';
-            var params = [email, day, jsonData]
+            var params = [email, toStringByFormatting(yesterdate), jsonData]
             mdbConn.dbInsert(sql, params)
           })
       }
-      console.log(day, '투약정보 저장 완료')
+      console.log(recordDate, '투약정보 저장 완료')
     })
 
 })
 
 //알림 보내기
 schedule.scheduleJob(' */1 * * * *', function () {
-
 
   var sql = 'SELECT email,TOKEN FROM notificationtoken'
   mdbConn.dbSelectall(sql, [])
@@ -158,8 +134,8 @@ function notificationHandler(when, token){
 
 
 function sendPushNotification(target_token, title, body) {
-  //target_token은 푸시 메시지를 받을 디바이스의 토큰값입니다
   let message = {
+    token: target_token,
     notification: {
       title: title,
       body: body,
@@ -171,18 +147,17 @@ function sendPushNotification(target_token, title, body) {
       priority:"high",
       notification: {
         channelId:'1:585309393841:android:2940a96afa932465df6390'
-    }
+      }
     },
-    token: target_token,
     apns: {
       payload: {
           aps: {
             badge: 2.0,
             "apns-priority": 5,
-              sound: 'default'
+            sound: 'default'
           },
       },
-  },
+    },
   }
   admin.messaging().send(message)
   .then(()=> {
