@@ -41,7 +41,8 @@ app.use(function (err, req, res, next) {
 // 12시 복약 내역 저장
 schedule.scheduleJob('0 0 * * *', function () {
   let today = new Date();
-  let yesterday = new Date(today.setDate(today.getDate() - 1)).getDay();
+  let yesterdate = new Date(today.setDate(today.getDate() - 1))
+  let yesterday = yesterdate.getDay();
   let recordDate = toStringByFormatting(yesterdate);
   var sql = 'SELECT email FROM Users'
   mdbConn.dbSelectall(sql, [])
